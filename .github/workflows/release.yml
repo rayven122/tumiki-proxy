@@ -6,9 +6,11 @@ on:
       - 'v*'
 
 jobs:
-  build:
+  build-and-release:
     name: Build ${{ matrix.os }} ${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: write
     strategy:
       matrix:
         include:
@@ -57,38 +59,11 @@ jobs:
       - name: Build binary
         run: npx pkg dist/bundle.js --compress GZip --target ${{ matrix.target }} --output dist/${{ matrix.artifact }}
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.artifact }}
-          path: dist/${{ matrix.artifact }}
-
-  release:
-    name: Create GitHub Release
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: dist
-
-      - name: Create Release
+      - name: Upload to Release
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            dist/tumiki-proxy-macos-x64/tumiki-proxy-macos-x64
-            dist/tumiki-proxy-macos-arm64/tumiki-proxy-macos-arm64
-            dist/tumiki-proxy-linux-x64/tumiki-proxy-linux-x64
-            dist/tumiki-proxy-win-x64.exe/tumiki-proxy-win-x64.exe
+          files: dist/${{ matrix.artifact }}
           draft: false
           prerelease: false
-          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
