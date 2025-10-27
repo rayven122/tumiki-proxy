@@ -1,0 +1,29 @@
+{
+  "name": "tumiki-proxy",
+  "version": "0.1.0",
+  "description": "Transparent MCP logging proxy - Phase 1: Local file logging",
+  "type": "module",
+  "bin": {
+    "tumiki-proxy": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "proxy",
+    "logging",
+    "json-rpc"
+  ],
+  "author": "tumiki-proxy contributors",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
