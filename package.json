@@ -9,7 +9,10 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "build:bundle": "esbuild src/index.ts --bundle --platform=node --target=node18 --format=cjs --outfile=dist/bundle.js",
+    "build:binary": "npm run build:bundle && pkg dist/bundle.js --compress GZip --targets node18-macos-x64,node18-macos-arm64,node18-linux-x64,node18-win-x64 --output dist/tumiki-proxy",
+    "build:all": "npm run build && npm run build:binary"
   },
   "keywords": [
     "mcp",
@@ -24,7 +27,13 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "esbuild": "^0.19.0",
+    "@yao-pkg/pkg": "^5.11.0"
+  },
+  "pkg": {
+    "assets": [],
+    "outputPath": "dist"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.20.2"

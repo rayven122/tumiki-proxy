@@ -1,0 +1,94 @@
+name: Release Binary
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }} ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          # macOS
+          - os: macos
+            arch: x64
+            runner: macos-13
+            target: node18-macos-x64
+            artifact: tumiki-proxy-macos-x64
+          - os: macos
+            arch: arm64
+            runner: macos-14
+            target: node18-macos-arm64
+            artifact: tumiki-proxy-macos-arm64
+          # Linux
+          - os: linux
+            arch: x64
+            runner: ubuntu-latest
+            target: node18-linux-x64
+            artifact: tumiki-proxy-linux-x64
+          # Windows
+          - os: windows
+            arch: x64
+            runner: windows-latest
+            target: node18-win-x64
+            artifact: tumiki-proxy-win-x64.exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Bundle with esbuild
+        run: npm run build:bundle
+
+      - name: Build binary
+        run: npx pkg dist/bundle.js --compress GZip --target ${{ matrix.target }} --output dist/${{ matrix.artifact }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/${{ matrix.artifact }}
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/tumiki-proxy-macos-x64/tumiki-proxy-macos-x64
+            dist/tumiki-proxy-macos-arm64/tumiki-proxy-macos-arm64
+            dist/tumiki-proxy-linux-x64/tumiki-proxy-linux-x64
+            dist/tumiki-proxy-win-x64.exe/tumiki-proxy-win-x64.exe
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
