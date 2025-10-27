@@ -4,14 +4,14 @@ MCP (Model Context Protocol) サーバーの透過的ロギングプロキシ。
 
 ## 特徴
 
-- **マルチトランスポート**: stdio、HTTP/StreamableHTTP、HTTP/SSEに対応
-- **公式SDK**: `@modelcontextprotocol/sdk`を使用
+- **マルチトランスポート対応**: stdio、HTTP/StreamableHTTP、HTTP/SSEに対応
+- **公式SDK使用**: `@modelcontextprotocol/sdk`をベースに構築
 - **自動フォールバック**: StreamableHTTP → SSEの自動切り替え
 - **認証対応**: HTTPベースサーバー向けAPIキーサポート
-- **透過的**: ゼロインパクトラッパー - MCPプロトコルに変更なし
-- **効率的**: 非同期バッファリングとバッチ処理（最小限のオーバーヘッド）
+- **透過的**: MCPプロトコルに変更を加えないゼロインパクトラッパー
+- **効率的**: 非同期バッファリングとバッチ処理による最小限のオーバーヘッド
 - **型安全**: TypeScriptによる完全実装
-- **統一ログ形式**: すべてのトランスポートでNDJSON形式
+- **統一ログ形式**: すべてのトランスポートでNDJSON形式を採用
 
 ## インストール
 
@@ -32,6 +32,8 @@ npm install -g .
 
 ### stdio モード（ローカルMCPサーバー）
 
+stdin/stdout で通信するローカルのMCPサーバーの場合：
+
 ```bash
 # ログファイルの場所を指定
 export TUMIKI_LOG_FILE="./mcp-filesystem.log"
@@ -40,7 +42,9 @@ export TUMIKI_LOG_FILE="./mcp-filesystem.log"
 tumiki-proxy npx -y @modelcontextprotocol/server-filesystem /path/to/dir
 ```
 
-### HTTP bridge モード（HTTPベースのMCPサーバー）
+### SSE・Streamable HTTP モード（リモートMCPサーバー）
+
+HTTP経由でアクセス可能なリモートMCPサーバーの場合：
 
 ```bash
 export TUMIKI_LOG_FILE="./mcp-context7.log"
@@ -48,9 +52,11 @@ export CONTEXT7_API_KEY="your-api-key"  # オプション
 tumiki-proxy --http https://mcp.context7.com/mcp
 ```
 
-## Claude Code MCP設定
+## Claude Code 設定
 
-### stdio サーバー
+`.mcp.json` ファイルを使った設定が推奨です。プロジェクトのルートディレクトリに `.mcp.json` を配置してください。
+
+### 設定例（`.mcp.json`）
 
 ```json
 {
@@ -64,48 +70,19 @@ tumiki-proxy --http https://mcp.context7.com/mcp
         "/path/to/dir"
       ],
       "env": {
-        "TUMIKI_LOG_FILE": "/path/to/mcp-filesystem.log"
+        "TUMIKI_LOG_FILE": "/tmp/mcp-filesystem.log"
       }
-    }
-  }
-}
-```
-
-### HTTP bridge サーバー
-
-```json
-{
-  "mcpServers": {
+    },
     "context7": {
       "command": "tumiki-proxy",
-      "args": ["--http", "https://mcp.context7.com/mcp"],
+      "args": [
+        "--http",
+        "https://mcp.context7.com/mcp"
+      ],
       "env": {
-        "TUMIKI_LOG_FILE": "/path/to/mcp-context7.log",
+        "TUMIKI_LOG_FILE": "/tmp/mcp-context7.log",
         "CONTEXT7_API_KEY": "your-api-key"
       }
-    }
-  }
-}
-```
-
-### ラッパースクリプト（推奨）
-
-各MCPサーバー用にラッパースクリプトを作成:
-
-**wrapper-filesystem.sh:**
-```bash
-#!/bin/bash
-export TUMIKI_LOG_FILE="${HOME}/.mcp-logs/filesystem.log"
-exec tumiki-proxy npx -y @modelcontextprotocol/server-filesystem "$@"
-```
-
-**MCP設定:**
-```json
-{
-  "mcpServers": {
-    "filesystem": {
-      "command": "/path/to/wrapper-filesystem.sh",
-      "args": ["/path/to/dir"]
     }
   }
 }
@@ -122,12 +99,12 @@ exec tumiki-proxy npx -y @modelcontextprotocol/server-filesystem "$@"
 | `TUMIKI_LOG_BATCH_SIZE` | いいえ | 100 | このサイズに達したらフラッシュ |
 | `TUMIKI_LOG_BATCH_TIMEOUT_MS` | いいえ | 100 | フラッシュ間隔（ミリ秒） |
 
-### HTTP bridge モード用の認証環境変数
+### 認証用環境変数（SSE・Streamable HTTP モード）
 
 | 変数 | 説明 |
 |----------|-------------|
-| `CONTEXT7_API_KEY` | Context7 専用APIキー |
-| `MCP_API_KEY` | 汎用 MCP APIキー |
+| `CONTEXT7_API_KEY` | Context7専用APIキー |
+| `MCP_API_KEY` | 汎用MCP APIキー |
 | `API_KEY` | フォールバック用APIキー |
 
 ### カスタム設定の例
@@ -143,7 +120,7 @@ tumiki-proxy your-mcp-server
 
 ## ログフォーマット
 
-ログは改行区切りJSON（NDJSON）形式で記録されます:
+ログは改行区切りJSON（NDJSON）形式で記録されます：
 
 ```json
 {"timestamp":"2024-01-15T10:30:00.000Z","type":"request","direction":"client→backend","backendCmd":"npx","message":{"jsonrpc":"2.0","id":1,"method":"tools/list"},"raw":"{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\"}"}
@@ -185,7 +162,7 @@ tumiki-proxy your-mcp-server
 └─────────────────┘
 ```
 
-### HTTP bridge モード
+### SSE・Streamable HTTP モード
 ```
 ┌─────────────┐
 │ Claude Code │
@@ -206,7 +183,7 @@ tumiki-proxy your-mcp-server
 │  │/SSE Client   │  │
 │  └──────────────┘  │
 └────────┬───────────┘
-         │ HTTP/SSE
+         │ Streamable HTTP/SSE
          ↓
 ┌─────────────────┐
 │  MCP Server     │
@@ -216,12 +193,12 @@ tumiki-proxy your-mcp-server
 
 ## トラブルシューティング
 
-### HTTP bridge モード接続確認
+### SSE・Streamable HTTP モード接続確認
 
 ログファイルでトランスポート選択を確認できます：
 
 ```bash
-# StreamableHTTP が使用された場合
+# Streamable HTTP が使用された場合
 {"type":"info","message":"Connected using StreamableHTTP transport"}
 
 # SSE にフォールバックした場合
@@ -229,19 +206,19 @@ tumiki-proxy your-mcp-server
 {"type":"info","message":"Connected using SSE transport"}
 ```
 
-### context7 接続エラー
+### HTTPサーバー接続エラー
 
-**症状**: MCP サーバーが failed 状態
+**症状**: MCPサーバーが failed 状態
 
-**原因と解決策**:
+**診断と解決策**:
 
-1. **API キーの問題**（認証が必要なサーバーの場合）
-   - Context7 の API キーを取得
-   - `.mcp.json` の `CONTEXT7_API_KEY` を設定
+1. **APIキーの問題**（認証が必要なサーバーの場合）
+   - サービスプロバイダーからAPIキーを取得
+   - 適切な環境変数を設定（`CONTEXT7_API_KEY`、`MCP_API_KEY`、または `API_KEY`）
    - Claude Code を再起動
 
 2. **トランスポート接続エラー**
-   - ログファイルで詳細を確認
+   - ログファイルで詳細なエラーメッセージを確認
    - StreamableHTTP と SSE の両方が失敗している場合、ネットワーク接続を確認
    - ファイアウォール設定を確認
 
@@ -250,7 +227,7 @@ tumiki-proxy your-mcp-server
 **確認事項**:
 1. `TUMIKI_LOG_FILE` 環境変数が設定されているか
 2. ログファイルのパスに書き込み権限があるか
-3. ログファイルが既に開かれていないか
+3. ログファイルが既に別のプロセスで開かれていないか
 
 ## 開発
 
@@ -268,12 +245,17 @@ npm run dev
 rm -rf dist
 ```
 
+## コントリビューション
+
+コントリビューションを歓迎します！お気軽にPull Requestを送信してください。
+
 ## ライセンス
 
-MIT License - 詳細はLICENSEファイルを参照
+MIT License - 詳細はLICENSEファイルを参照してください
 
 ## 今後のロードマップ
 
-- **Phase 2**: クラウドストレージへのHTTPアップロード（S3、GCSなど）
-- **Phase 3**: ログビューアと分析用Electron GUI
-- **Phase 4**: パッケージングとリリース管理
+- **クラウドストレージ連携**: クラウドストレージサービス（S3、GCSなど）へのHTTPアップロード
+- **ログビューアー**: ログの表示と分析のためのElectronベースGUI
+- **分析機能の強化**: MCPトラフィックパターンとパフォーマンスを分析する組み込みツール
+- **パッケージ配布**: より簡単なインストールのためのNPMパッケージ公開
