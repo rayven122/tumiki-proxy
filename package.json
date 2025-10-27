@@ -1,7 +1,7 @@
 {
   "name": "tumiki-proxy",
-  "version": "0.1.0",
-  "description": "Transparent MCP logging proxy - Phase 1: Local file logging",
+  "version": "0.1.5",
+  "description": "Transparent MCP logging proxy - Phase 1: stdio-only / Phase 1.5: Multi-transport (stdio, HTTP/StreamableHTTP, SSE) with SDK",
   "type": "module",
   "bin": {
     "tumiki-proxy": "./dist/index.js",
