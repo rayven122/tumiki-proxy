@@ -4,7 +4,8 @@
   "description": "Transparent MCP logging proxy - Phase 1: Local file logging",
   "type": "module",
   "bin": {
-    "tumiki-proxy": "./dist/index.js"
+    "tumiki-proxy": "./dist/index.js",
+    "tumiki-proxy-sdk": "./dist/index-sdk.js"
   },
   "scripts": {
     "build": "tsc",
@@ -25,5 +26,8 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.20.2"
   }
 }

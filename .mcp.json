@@ -3,14 +3,25 @@
     "filesystem": {
       "command": "node",
       "args": [
-        "/Users/hisuzuya/Documents/app/rayven/tumiki-proxy/dist/index.js",
+        "/Users/hisuzuya/Documents/app/rayven/tumiki-proxy/dist/index-sdk.js",
         "npx",
         "-y",
         "@modelcontextprotocol/server-filesystem",
         "/Users/hisuzuya/Documents/app/rayven/tumiki-proxy"
       ],
       "env": {
-        "TUMIKI_LOG_FILE": "/tmp/mcp-filesystem.log"
+        "TUMIKI_LOG_FILE": "/tmp/mcp-filesystem-sdk.log"
+      }
+    },
+    "context7": {
+      "command": "node",
+      "args": [
+        "/Users/hisuzuya/Documents/app/rayven/tumiki-proxy/dist/index-sdk.js",
+        "--http",
+        "https://mcp.context7.com/mcp"
+      ],
+      "env": {
+        "TUMIKI_LOG_FILE": "/tmp/mcp-context7.log"
       }
     }
   }
