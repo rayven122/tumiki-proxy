@@ -2,21 +2,16 @@
 
 MCP (Model Context Protocol) サーバーの透過的ロギングプロキシ。Claude Code とバックエンドサーバー間のすべてのMCPトラフィックをローカルファイルに記録し、デバッグと分析を支援します。
 
-## 機能
+## 特徴
 
-### Phase 1 (stdio専用、`tumiki-proxy`)
-- **透過的**: ゼロインパクトラッパー - あらゆるstdioベースのMCPサーバーに対応
-- **効率的**: 非同期バッファリングとバッチ処理（最小限のオーバーヘッド）
-- **シンプル**: 環境変数1つで設定完了
-- **軽量**: 約310行、外部依存なし
-- **型安全**: TypeScriptによる完全実装
-
-### Phase 1.5 (SDKベース、`tumiki-proxy-sdk`)
 - **マルチトランスポート**: stdio、HTTP/StreamableHTTP、HTTP/SSEに対応
 - **公式SDK**: `@modelcontextprotocol/sdk`を使用
 - **自動フォールバック**: StreamableHTTP → SSEの自動切り替え
 - **認証対応**: HTTPベースサーバー向けAPIキーサポート
-- **高度な機能**: HTTPブリッジとサーバーモードについては[README-SDK.md](./README-SDK.md)を参照
+- **透過的**: ゼロインパクトラッパー - MCPプロトコルに変更なし
+- **効率的**: 非同期バッファリングとバッチ処理（最小限のオーバーヘッド）
+- **型安全**: TypeScriptによる完全実装
+- **統一ログ形式**: すべてのトランスポートでNDJSON形式
 
 ## インストール
 
@@ -33,66 +28,35 @@ npm run build
 npm install -g .
 ```
 
-**注意**: Phase 1.5には`@modelcontextprotocol/sdk`が必要です（依存関係に含まれています）。
-
 ## 使用方法
 
-### Phase 1: 基本的なstdioモード（`tumiki-proxy`）
+### stdio モード（ローカルMCPサーバー）
 
 ```bash
 # ログファイルの場所を指定
-export TUMIKI_LOG_FILE="./mcp-traffic.log"
+export TUMIKI_LOG_FILE="./mcp-filesystem.log"
 
 # stdioベースのMCPサーバーをプロキシ経由で実行
-tumiki-proxy npx -y @modelcontextprotocol/server-everything
+tumiki-proxy npx -y @modelcontextprotocol/server-filesystem /path/to/dir
 ```
 
-### Phase 1.5: 高度なモード（`tumiki-proxy-sdk`）
+### HTTP bridge モード（HTTPベースのMCPサーバー）
 
-#### stdio モード（Phase 1と同じ）
-```bash
-export TUMIKI_LOG_FILE="./mcp-traffic.log"
-tumiki-proxy-sdk npx -y @modelcontextprotocol/server-filesystem /path
-```
-
-#### HTTP ブリッジモード（HTTPベースのMCPサーバー用）
 ```bash
 export TUMIKI_LOG_FILE="./mcp-context7.log"
-export CONTEXT7_API_KEY="your-api-key"
-tumiki-proxy-sdk --http https://mcp.context7.com/mcp
+export CONTEXT7_API_KEY="your-api-key"  # オプション
+tumiki-proxy --http https://mcp.context7.com/mcp
 ```
 
-Phase 1.5の完全なドキュメント（HTTPサーバーモード、認証など）については、[README-SDK.md](./README-SDK.md)を参照してください。
+## Claude Code MCP設定
 
-### Claude Code MCP設定
-
-#### Phase 1: stdio専用サーバー
-
-```json
-{
-  "mcpServers": {
-    "everything": {
-      "command": "tumiki-proxy",
-      "args": [
-        "npx",
-        "-y",
-        "@modelcontextprotocol/server-everything"
-      ],
-      "env": {
-        "TUMIKI_LOG_FILE": "/path/to/mcp-everything.log"
-      }
-    }
-  }
-}
-```
-
-#### Phase 1.5: stdioサーバー（Phase 1と互換性あり）
+### stdio サーバー
 
 ```json
 {
   "mcpServers": {
     "filesystem": {
-      "command": "tumiki-proxy-sdk",
+      "command": "tumiki-proxy",
       "args": [
         "npx",
         "-y",
@@ -107,13 +71,13 @@ Phase 1.5の完全なドキュメント（HTTPサーバーモード、認証な�
 }
 ```
 
-#### Phase 1.5: HTTPブリッジモード（HTTPベースサーバー用）
+### HTTP bridge サーバー
 
 ```json
 {
   "mcpServers": {
     "context7": {
-      "command": "tumiki-proxy-sdk",
+      "command": "tumiki-proxy",
       "args": ["--http", "https://mcp.context7.com/mcp"],
       "env": {
         "TUMIKI_LOG_FILE": "/path/to/mcp-context7.log",
@@ -128,20 +92,20 @@ Phase 1.5の完全なドキュメント（HTTPサーバーモード、認証な�
 
 各MCPサーバー用にラッパースクリプトを作成:
 
-**wrapper-everything.sh:**
+**wrapper-filesystem.sh:**
 ```bash
 #!/bin/bash
-export TUMIKI_LOG_FILE="${HOME}/.mcp-logs/everything.log"
-exec tumiki-proxy npx -y @modelcontextprotocol/server-everything "$@"
+export TUMIKI_LOG_FILE="${HOME}/.mcp-logs/filesystem.log"
+exec tumiki-proxy npx -y @modelcontextprotocol/server-filesystem "$@"
 ```
 
 **MCP設定:**
 ```json
 {
   "mcpServers": {
-    "everything": {
-      "command": "/path/to/wrapper-everything.sh",
-      "args": []
+    "filesystem": {
+      "command": "/path/to/wrapper-filesystem.sh",
+      "args": ["/path/to/dir"]
     }
   }
 }
@@ -157,6 +121,14 @@ exec tumiki-proxy npx -y @modelcontextprotocol/server-everything "$@"
 | `TUMIKI_LOG_BUFFER_SIZE` | いいえ | 1000 | ドロップ前のキュー内の最大エントリ数 |
 | `TUMIKI_LOG_BATCH_SIZE` | いいえ | 100 | このサイズに達したらフラッシュ |
 | `TUMIKI_LOG_BATCH_TIMEOUT_MS` | いいえ | 100 | フラッシュ間隔（ミリ秒） |
+
+### HTTP bridge モード用の認証環境変数
+
+| 変数 | 説明 |
+|----------|-------------|
+| `CONTEXT7_API_KEY` | Context7 専用APIキー |
+| `MCP_API_KEY` | 汎用 MCP APIキー |
+| `API_KEY` | フォールバック用APIキー |
 
 ### カスタム設定の例
 
@@ -176,33 +148,20 @@ tumiki-proxy your-mcp-server
 ```json
 {"timestamp":"2024-01-15T10:30:00.000Z","type":"request","direction":"client→backend","backendCmd":"npx","message":{"jsonrpc":"2.0","id":1,"method":"tools/list"},"raw":"{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\"}"}
 {"timestamp":"2024-01-15T10:30:00.100Z","type":"response","direction":"backend→client","backendCmd":"npx","message":{"jsonrpc":"2.0","id":1,"result":{"tools":[...]}},"raw":"{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[...]}}"}
-{"timestamp":"2024-01-15T10:30:00.150Z","type":"stderr","backendCmd":"npx","message":"Debug: Tool loaded"}
-{"timestamp":"2024-01-15T10:30:00.200Z","type":"info","backendCmd":"npx","message":"Backend exited: code=0, signal=null"}
+{"timestamp":"2024-01-15T10:30:00.150Z","type":"info","backendCmd":"--http","message":"Connected using StreamableHTTP transport"}
 ```
 
 ### ログエントリタイプ
 
 - `request`: クライアント → バックエンド（Claude Code → MCPサーバー）
 - `response`: バックエンド → クライアント（MCPサーバー → Claude Code）
-- `stderr`: バックエンドのエラー出力
-- `info`: プロキシのライフサイクルイベント（起動、終了）
+- `stderr`: バックエンドのエラー出力（stdioモードのみ）
+- `info`: プロキシのライフサイクルイベント（起動、終了、接続情報）
 - `error`: プロキシのエラー
-
-## 開発
-
-```bash
-# 依存関係のインストール
-npm install
-
-# TypeScriptのビルド
-npm run build
-
-# ビルド成果物のクリーンアップ
-npm run clean
-```
 
 ## アーキテクチャ
 
+### stdio モード
 ```
 ┌─────────────┐
 │ Claude Code │
@@ -215,14 +174,98 @@ npm run clean
 │  │ FileLogger   │──┼─→ ローカルログファイル (NDJSON)
 │  └──────────────┘  │
 │  ┌──────────────┐  │
-│  │ TumikiProxy  │  │
+│  │ spawn + pipe │  │
 │  └──────────────┘  │
 └────────┬───────────┘
          │ stdin/stdout (透過的)
          ↓
 ┌─────────────────┐
-│   MCP Server    │
+│  MCP Server     │
+│  (stdio)        │
 └─────────────────┘
+```
+
+### HTTP bridge モード
+```
+┌─────────────┐
+│ Claude Code │
+└──────┬──────┘
+       │ stdin/stdout
+       ↓
+┌────────────────────┐
+│  tumiki-proxy      │
+│  ┌──────────────┐  │
+│  │ FileLogger   │──┼─→ ローカルログファイル (NDJSON)
+│  └──────────────┘  │
+│  ┌──────────────┐  │
+│  │ Stdio Server │  │
+│  │ Transport    │  │
+│  └──────────────┘  │
+│  ┌──────────────┐  │
+│  │StreamableHTTP│  │
+│  │/SSE Client   │  │
+│  └──────────────┘  │
+└────────┬───────────┘
+         │ HTTP/SSE
+         ↓
+┌─────────────────┐
+│  MCP Server     │
+│  (HTTP)         │
+└─────────────────┘
+```
+
+## トラブルシューティング
+
+### HTTP bridge モード接続確認
+
+ログファイルでトランスポート選択を確認できます：
+
+```bash
+# StreamableHTTP が使用された場合
+{"type":"info","message":"Connected using StreamableHTTP transport"}
+
+# SSE にフォールバックした場合
+{"type":"info","message":"StreamableHTTP connection failed, falling back to SSE transport"}
+{"type":"info","message":"Connected using SSE transport"}
+```
+
+### context7 接続エラー
+
+**症状**: MCP サーバーが failed 状態
+
+**原因と解決策**:
+
+1. **API キーの問題**（認証が必要なサーバーの場合）
+   - Context7 の API キーを取得
+   - `.mcp.json` の `CONTEXT7_API_KEY` を設定
+   - Claude Code を再起動
+
+2. **トランスポート接続エラー**
+   - ログファイルで詳細を確認
+   - StreamableHTTP と SSE の両方が失敗している場合、ネットワーク接続を確認
+   - ファイアウォール設定を確認
+
+### ログファイルが作成されない
+
+**確認事項**:
+1. `TUMIKI_LOG_FILE` 環境変数が設定されているか
+2. ログファイルのパスに書き込み権限があるか
+3. ログファイルが既に開かれていないか
+
+## 開発
+
+```bash
+# 依存関係のインストール
+npm install
+
+# TypeScriptのビルド
+npm run build
+
+# ウォッチモード
+npm run dev
+
+# ビルド成果物のクリーンアップ
+rm -rf dist
 ```
 
 ## ライセンス

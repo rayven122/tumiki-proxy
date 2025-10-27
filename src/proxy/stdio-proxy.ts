@@ -3,9 +3,10 @@ import { Readable, Writable } from "stream";
 import { FileLogger } from "../logger/file-logger.js";
 
 /**
- * Transparent proxy that wraps MCP servers and logs all traffic
+ * Simple stdio proxy using spawn + pipe
+ * Transparently forwards stdin/stdout between Claude Code and MCP server
  */
-export class TumikiProxy {
+export class StdioProxy {
   private backendProcess: ChildProcess | null = null;
   private logger: FileLogger;
 
@@ -13,13 +14,10 @@ export class TumikiProxy {
     this.logger = logger;
   }
 
-  /**
-   * Start the proxy: spawn backend process and set up pipes
-   */
   async start(command: string, args: string[]): Promise<void> {
     this.logger.logInfo(`Starting backend: ${command} ${args.join(" ")}`);
 
-    // Spawn backend MCP server
+    // Backend process startup
     this.backendProcess = spawn(command, args, {
       stdio: ["pipe", "pipe", "pipe"],
     });
@@ -41,14 +39,14 @@ export class TumikiProxy {
       process.stderr.write(data);
     });
 
-    // Handle backend process exit
+    // Process exit handling
     this.backendProcess.on("exit", async (code, signal) => {
       this.logger.logInfo(`Backend exited: code=${code}, signal=${signal}`);
       await this.close();
       process.exit(code || 0);
     });
 
-    // Handle backend process errors
+    // Error handling
     this.backendProcess.on("error", async (err) => {
       this.logger.logError(`Backend error: ${err.message}`);
       await this.close();
@@ -56,9 +54,6 @@ export class TumikiProxy {
     });
   }
 
-  /**
-   * Pipe data from source to destination with logging
-   */
   private pipeWithLog(
     source: Readable,
     destination: Writable,
@@ -74,9 +69,6 @@ export class TumikiProxy {
     });
   }
 
-  /**
-   * Close proxy: kill backend process and close logger
-   */
   async close(): Promise<void> {
     if (this.backendProcess && !this.backendProcess.killed) {
       this.backendProcess.kill();

@@ -1,11 +1,10 @@
 {
   "name": "tumiki-proxy",
-  "version": "0.1.5",
-  "description": "Transparent MCP logging proxy - Phase 1: stdio-only / Phase 1.5: Multi-transport (stdio, HTTP/StreamableHTTP, SSE) with SDK",
+  "version": "0.2.0",
+  "description": "Transparent MCP logging proxy with multi-transport support (stdio, HTTP/StreamableHTTP, HTTP/SSE)",
   "type": "module",
   "bin": {
-    "tumiki-proxy": "./dist/index.js",
-    "tumiki-proxy-sdk": "./dist/index-sdk.js"
+    "tumiki-proxy": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
