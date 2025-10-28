@@ -21,20 +21,20 @@ GitHubのReleasesページから、お使いのプラットフォーム用のビ
 
 ```bash
 # macOS (ARM64)
-curl -L -o tumiki-proxy https://github.com/yourusername/tumiki-proxy/releases/latest/download/tumiki-proxy-macos-arm64
+curl -L -o tumiki-proxy https://github.com/rayven122/tumiki-proxy/releases/latest/download/tumiki-proxy-macos-arm64
 chmod +x tumiki-proxy
 
 # macOS (x64)
-curl -L -o tumiki-proxy https://github.com/yourusername/tumiki-proxy/releases/latest/download/tumiki-proxy-macos-x64
+curl -L -o tumiki-proxy https://github.com/rayven122/tumiki-proxy/releases/latest/download/tumiki-proxy-macos-x64
 chmod +x tumiki-proxy
 
 # Linux (x64)
-curl -L -o tumiki-proxy https://github.com/yourusername/tumiki-proxy/releases/latest/download/tumiki-proxy-linux-x64
+curl -L -o tumiki-proxy https://github.com/rayven122/tumiki-proxy/releases/latest/download/tumiki-proxy-linux-x64
 chmod +x tumiki-proxy
 
 # Windows (x64)
 # PowerShellで実行:
-Invoke-WebRequest -Uri "https://github.com/yourusername/tumiki-proxy/releases/latest/download/tumiki-proxy-win-x64.exe" -OutFile "tumiki-proxy.exe"
+Invoke-WebRequest -Uri "https://github.com/rayven122/tumiki-proxy/releases/latest/download/tumiki-proxy-win-x64.exe" -OutFile "tumiki-proxy.exe"
 ```
 
 ### 方法2: ソースからビルド
@@ -43,7 +43,7 @@ Invoke-WebRequest -Uri "https://github.com/yourusername/tumiki-proxy/releases/la
 
 ```bash
 # リポジトリをクローン
-git clone https://github.com/yourusername/tumiki-proxy.git
+git clone https://github.com/rayven122/tumiki-proxy.git
 cd tumiki-proxy
 
 # Bunで依存関係のインストールとビルド
@@ -59,7 +59,7 @@ bun run build:binary
 
 ```bash
 # リポジトリをクローン
-git clone https://github.com/yourusername/tumiki-proxy.git
+git clone https://github.com/rayven122/tumiki-proxy.git
 cd tumiki-proxy
 
 # 依存関係のインストールとビルド
