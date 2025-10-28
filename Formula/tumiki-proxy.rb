@@ -1,23 +1,23 @@
 class TumikiProxy < Formula
   desc "Transparent MCP logging proxy with multi-transport support"
   homepage "https://github.com/rayven122/tumiki-proxy"
-  version "0.2.1"
+  version "0.2.2"
   license "MIT"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/rayven122/tumiki-proxy/releases/download/v0.2.1/tumiki-proxy-macos-arm64"
-      sha256 "3412fa759e827a183195dd339f030ebe9cf0b3a7bb87b18c5b87690b0033a79a"
+      url "https://github.com/rayven122/tumiki-proxy/releases/download/v0.2.2/tumiki-proxy-macos-arm64"
+      sha256 "7136b1a465d8e6c2e35f1141153904240fb26dbc7535c1098cb22e591478eca7"
     else
-      url "https://github.com/rayven122/tumiki-proxy/releases/download/v0.2.1/tumiki-proxy-macos-x64"
-      sha256 "0d1272992c83ad09df6807bcc881723740596ddd6c2ad88d40a3d28c9e2ea1e3"
+      url "https://github.com/rayven122/tumiki-proxy/releases/download/v0.2.2/tumiki-proxy-macos-x64"
+      sha256 "32e788fcf8e06744f6bc7bff939a5f668d1fb6208dba58fe4e9655ef15daed4c"
     end
   end
 
   on_linux do
     if Hardware::CPU.intel?
-      url "https://github.com/rayven122/tumiki-proxy/releases/download/v0.2.1/tumiki-proxy-linux-x64"
-      sha256 "4e1d35471c6ff4fc5c74571b6d90a88417dc90ce9fd2d3a6bbc72a3e2ece71b7"
+      url "https://github.com/rayven122/tumiki-proxy/releases/download/v0.2.2/tumiki-proxy-linux-x64"
+      sha256 "60cd461633e7e900a9b7f25230c38423b1728bcafc002f2196f12f487dedcfd4"
     end
   end
 
