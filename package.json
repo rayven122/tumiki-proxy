@@ -1,6 +1,6 @@
 {
   "name": "tumiki-proxy",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Transparent MCP logging proxy with multi-transport support (stdio, HTTP/StreamableHTTP, HTTP/SSE)",
   "type": "module",
   "bin": {
