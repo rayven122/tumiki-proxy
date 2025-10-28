@@ -5,7 +5,7 @@ import { FileLogger } from "./logger/file-logger.js";
 import { StdioProxy } from "./proxy/stdio-proxy.js";
 import { StdioStreamableHttp } from "./proxy/stdio-streamable-http.js";
 
-const VERSION = "0.2.1";
+const VERSION = "0.2.2";
 
 /**
  * Show version information
