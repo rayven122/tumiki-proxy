@@ -7,22 +7,23 @@ class TumikiProxy < Formula
   on_macos do
     if Hardware::CPU.arm?
       url "https://github.com/rayven122/tumiki-proxy/releases/download/v0.2.0/tumiki-proxy-macos-arm64"
-      sha256 "0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5"
+      sha256 "d9ddd1d01912b33d1dfa95e9d5d210a679a9da17fc7ea2134606993cdcf405de"
     else
       url "https://github.com/rayven122/tumiki-proxy/releases/download/v0.2.0/tumiki-proxy-macos-x64"
-      sha256 "0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5"
+      sha256 "338e31ac0c9ad93cf6b33db50fd660fc4cb2e8d20699830b26684ed4368554fb"
     end
   end
 
   on_linux do
     if Hardware::CPU.intel?
       url "https://github.com/rayven122/tumiki-proxy/releases/download/v0.2.0/tumiki-proxy-linux-x64"
-      sha256 "0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5"
+      sha256 "e8d91f916914e5945e970916f1b78b1aff88f1088eb7ef6d5af9cc9f743b73c7"
     end
   end
 
   def install
-    bin.install Dir["tumiki-proxy*"].first => "tumiki-proxy"
+    # Downloaded binary has platform-specific name, rename to tumiki-proxy
+    bin.install Dir["*"].select { |f| File.file?(f) && File.executable?(f) }.first => "tumiki-proxy"
   end
 
   test do

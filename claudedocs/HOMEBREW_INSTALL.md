@@ -13,23 +13,16 @@ tumiki-proxyをHomebrewでインストールするためのユーザー向けガ
 
 ## インストール方法
 
-### オプション1: リポジトリから直接インストール（推奨）
+### Formulaを直接指定（推奨）
 
-最も簡単な方法です。Tapを追加する必要はありません。
-
-```bash
-# リポジトリから直接インストール
-brew install rayven122/tumiki-proxy/tumiki-proxy
-
-# バージョン確認
-tumiki-proxy --version
-```
-
-### オプション2: Formulaを直接指定
+最も簡単な方法です。Tapリポジトリを作成する必要はありません。
 
 ```bash
 # Formulaを直接指定してインストール
 brew install https://raw.githubusercontent.com/rayven122/tumiki-proxy/main/Formula/tumiki-proxy.rb
+
+# バージョン確認
+tumiki-proxy --version
 ```
 
 ## 使用方法
@@ -52,18 +45,6 @@ tumiki-proxy --http https://mcp.context7.com/mcp
 ```
 
 ## アップデート
-
-### Tapからインストールした場合
-
-```bash
-# Tapを更新
-brew update
-
-# tumiki-proxyをアップグレード
-brew upgrade tumiki-proxy
-```
-
-### 直接インストールした場合
 
 ```bash
 # 再インストール（最新版を取得）
