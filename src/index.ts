@@ -5,6 +5,43 @@ import { FileLogger } from "./logger/file-logger.js";
 import { StdioProxy } from "./proxy/stdio-proxy.js";
 import { StdioStreamableHttp } from "./proxy/stdio-streamable-http.js";
 
+const VERSION = "0.2.0";
+
+/**
+ * Show version information
+ */
+function showVersion() {
+  console.log(`tumiki-proxy version ${VERSION}`);
+  console.log("Transparent MCP logging proxy with multi-transport support");
+  process.exit(0);
+}
+
+/**
+ * Show help information
+ */
+function showHelp() {
+  console.log(`tumiki-proxy version ${VERSION}`);
+  console.log("");
+  console.log("Usage:");
+  console.log("  stdio mode:           tumiki-proxy <command> [args...]");
+  console.log("  streamable HTTP mode: tumiki-proxy --http <URL>");
+  console.log("");
+  console.log("Options:");
+  console.log("  -v, --version    Show version information");
+  console.log("  -h, --help       Show this help message");
+  console.log("");
+  console.log("Environment Variables:");
+  console.log("  TUMIKI_LOG_FILE              Path to log file (required)");
+  console.log("  TUMIKI_LOG_BUFFER_SIZE       Buffer size (default: 1000)");
+  console.log("  TUMIKI_LOG_BATCH_SIZE        Batch size (default: 100)");
+  console.log("  TUMIKI_LOG_BATCH_TIMEOUT_MS  Batch timeout (default: 100)");
+  console.log("");
+  console.log("Examples:");
+  console.log("  TUMIKI_LOG_FILE=./mcp.log tumiki-proxy npx -y @modelcontextprotocol/server-filesystem /path");
+  console.log("  TUMIKI_LOG_FILE=./mcp.log tumiki-proxy --http https://mcp.context7.com/mcp");
+  process.exit(0);
+}
+
 /**
  * Detect mode: stdio or streamable-http
  */
@@ -109,6 +146,17 @@ async function runStreamableHttp() {
  * Main entry point
  */
 async function main() {
+  // Check for version or help flags first (before any env variable checks)
+  const args = process.argv.slice(2);
+
+  if (args.includes("-v") || args.includes("--version")) {
+    showVersion();
+  }
+
+  if (args.includes("-h") || args.includes("--help") || args.length === 0) {
+    showHelp();
+  }
+
   const mode = detectMode();
 
   if (mode === "stdio") {
