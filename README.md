@@ -15,6 +15,48 @@ MCP (Model Context Protocol) サーバーの透過的ロギングプロキシ。
 
 ## インストール
 
+### 方法1: バイナリ配布（推奨）
+
+GitHubのReleasesページから、お使いのプラットフォーム用のビルド済みバイナリをダウンロード：
+
+```bash
+# macOS (ARM64)
+curl -L -o tumiki-proxy https://github.com/yourusername/tumiki-proxy/releases/latest/download/tumiki-proxy-macos-arm64
+chmod +x tumiki-proxy
+
+# macOS (x64)
+curl -L -o tumiki-proxy https://github.com/yourusername/tumiki-proxy/releases/latest/download/tumiki-proxy-macos-x64
+chmod +x tumiki-proxy
+
+# Linux (x64)
+curl -L -o tumiki-proxy https://github.com/yourusername/tumiki-proxy/releases/latest/download/tumiki-proxy-linux-x64
+chmod +x tumiki-proxy
+
+# Windows (x64)
+# PowerShellで実行:
+Invoke-WebRequest -Uri "https://github.com/yourusername/tumiki-proxy/releases/latest/download/tumiki-proxy-win-x64.exe" -OutFile "tumiki-proxy.exe"
+```
+
+### 方法2: ソースからビルド
+
+#### Bunを使用（推奨 - スタンドアロンバイナリ）
+
+```bash
+# リポジトリをクローン
+git clone https://github.com/yourusername/tumiki-proxy.git
+cd tumiki-proxy
+
+# Bunで依存関係のインストールとビルド
+bun install
+bun run build
+
+# スタンドアロンバイナリの生成
+bun run build:binary
+# → tumiki-proxy バイナリが生成されます
+```
+
+#### Node.jsを使用（従来の方法）
+
 ```bash
 # リポジトリをクローン
 git clone https://github.com/yourusername/tumiki-proxy.git
@@ -24,8 +66,8 @@ cd tumiki-proxy
 npm install
 npm run build
 
-# オプション: グローバルインストール
-npm install -g .
+# Node.js経由で実行
+node dist/index.js [args...]
 ```
 
 ## 使用方法
@@ -62,7 +104,7 @@ tumiki-proxy --http https://mcp.context7.com/mcp
 {
   "mcpServers": {
     "filesystem": {
-      "command": "tumiki-proxy",
+      "command": "./tumiki-proxy",
       "args": [
         "npx",
         "-y",
@@ -74,7 +116,7 @@ tumiki-proxy --http https://mcp.context7.com/mcp
       }
     },
     "context7": {
-      "command": "tumiki-proxy",
+      "command": "./tumiki-proxy",
       "args": [
         "--http",
         "https://mcp.context7.com/mcp"
@@ -87,6 +129,8 @@ tumiki-proxy --http https://mcp.context7.com/mcp
   }
 }
 ```
+
+**注意**: バイナリ版を使用する場合は `./tumiki-proxy` のように相対パスまたは絶対パスを指定してください。Node.js版を使用する場合は `node dist/index.js` を command に指定し、args の最初に実際のコマンドを配置してください。
 
 ## 設定
 
@@ -231,6 +275,30 @@ tumiki-proxy your-mcp-server
 
 ## 開発
 
+### Bunを使用した開発（推奨）
+
+```bash
+# 依存関係のインストール
+bun install
+
+# TypeScriptのビルド
+bun run build
+
+# ウォッチモード
+bun run dev
+
+# スタンドアロンバイナリの生成
+bun run build:binary
+# → tumiki-proxy バイナリが生成されます (57MB)
+# → Bun runtime込みの完全なスタンドアロン実行ファイル
+# → 外部ランタイム不要、高速起動
+
+# ビルド成果物のクリーンアップ
+rm -rf dist tumiki-proxy
+```
+
+### Node.jsを使用した開発
+
 ```bash
 # 依存関係のインストール
 npm install
@@ -244,6 +312,20 @@ npm run dev
 # ビルド成果物のクリーンアップ
 rm -rf dist
 ```
+
+### 技術仕様
+
+**バイナリビルド**:
+- **ツール**: Bun 1.x
+- **サイズ**: 約57MB (Bun runtime含む)
+- **起動時間**: < 100ms
+- **互換性**: macOS (x64/ARM64), Linux (x64), Windows (x64)
+- **依存関係**: なし（完全スタンドアロン）
+
+**Node.js版**:
+- **要件**: Node.js >= 18.0.0
+- **依存関係**: @modelcontextprotocol/sdk
+- **実行**: `node dist/index.js`
 
 ## コントリビューション
 
