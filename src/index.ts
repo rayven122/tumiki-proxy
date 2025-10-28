@@ -3,16 +3,16 @@
 import { loadConfig } from "./config/config.js";
 import { FileLogger } from "./logger/file-logger.js";
 import { StdioProxy } from "./proxy/stdio-proxy.js";
-import { StdioHttpBridgeSimple } from "./proxy/stdio-http-bridge-simple.js";
+import { StdioStreamableHttp } from "./proxy/stdio-streamable-http.js";
 
 /**
- * Detect mode: stdio or http-bridge
+ * Detect mode: stdio or streamable-http
  */
-function detectMode(): "stdio" | "http-bridge" {
-  // Check for HTTP bridge mode: --http <URL>
+function detectMode(): "stdio" | "streamable-http" {
+  // Check for streamable HTTP mode: --http <URL>
   const httpIndex = process.argv.indexOf("--http");
   if (httpIndex !== -1 && process.argv.length > httpIndex + 1) {
-    return "http-bridge";
+    return "streamable-http";
   }
 
   // Default to stdio mode
@@ -69,9 +69,9 @@ async function runStdioMode() {
 
 
 /**
- * HTTP bridge mode: stdio ↔ HTTP/SSE bridge
+ * Streamable HTTP mode: stdio ↔ HTTP/SSE bridge
  */
-async function runHttpBridge() {
+async function runStreamableHttp() {
   try {
     // Get URL from arguments
     const httpIndex = process.argv.indexOf("--http");
@@ -92,12 +92,12 @@ async function runHttpBridge() {
     const logger = new FileLogger(config);
     await logger.init();
 
-    logger.logInfo("tumiki-proxy starting (HTTP bridge mode)");
+    logger.logInfo("tumiki-proxy starting (streamable HTTP mode)");
     logger.logInfo(`Log file: ${config.filePath}`);
     logger.logInfo(`Target URL: ${targetUrl}`);
 
     // Initialize and start bridge
-    const bridge = new StdioHttpBridgeSimple(logger);
+    const bridge = new StdioStreamableHttp(logger);
     await bridge.start(targetUrl);
   } catch (error) {
     console.error(`[tumiki-proxy] Fatal error: ${error}`);
@@ -113,14 +113,14 @@ async function main() {
 
   if (mode === "stdio") {
     await runStdioMode();
-  } else if (mode === "http-bridge") {
-    await runHttpBridge();
+  } else if (mode === "streamable-http") {
+    await runStreamableHttp();
   } else {
     console.error("Unknown mode");
     console.error("");
     console.error("Usage:");
-    console.error("  stdio mode:        tumiki-proxy <command> [args...]");
-    console.error("  HTTP bridge mode:  tumiki-proxy --http <URL>");
+    console.error("  stdio mode:           tumiki-proxy <command> [args...]");
+    console.error("  streamable HTTP mode: tumiki-proxy --http <URL>");
     process.exit(1);
   }
 }

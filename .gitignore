@@ -5,6 +5,9 @@ node_modules/
 dist/
 dist/bundle.js
 dist/tumiki-proxy*
+tumiki-proxy
+tumiki-proxy-*
+!tumiki-proxy-cloud-design.md
 
 # Logs
 *.log
@@ -30,3 +33,5 @@ coverage/
 # Temporary files
 *.tmp
 .env
+*-00000000.bun-build
+*.bun-build

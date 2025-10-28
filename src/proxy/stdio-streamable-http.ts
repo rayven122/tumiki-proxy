@@ -10,7 +10,7 @@ import { FileLogger } from "../logger/file-logger.js";
  * Forwards messages between Claude Code (stdio) and HTTP MCP server
  * Supports both StreamableHTTP (new) and SSE (legacy) transports with automatic fallback
  */
-export class StdioHttpBridgeSimple {
+export class StdioStreamableHttp {
   private stdioTransport: StdioServerTransport | null = null;
   private httpTransport: Transport | null = null;
   private logger: FileLogger;
@@ -56,7 +56,7 @@ export class StdioHttpBridgeSimple {
    * Start the bridge
    */
   async start(targetUrl: string): Promise<void> {
-    this.logger.logInfo(`Starting stdio-http bridge to: ${targetUrl}`);
+    this.logger.logInfo(`Starting stdio-streamable-http bridge to: ${targetUrl}`);
 
     try {
       // Get API key from environment if available
