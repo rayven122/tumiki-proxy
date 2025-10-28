@@ -11,7 +11,9 @@
     "dev": "tsc --watch",
     "start": "node dist/index.js",
     "build:bundle": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/bundle.cjs --keep-names",
-    "build:binary": "npm run build:bundle && pkg dist/bundle.cjs --compress GZip --targets node20-macos-x64,node20-macos-arm64,node20-linux-x64,node20-win-x64 --output dist/tumiki-proxy",
+    "build:binary:pkg": "npm run build:bundle && pkg dist/bundle.cjs --compress GZip --targets node20-macos-x64,node20-macos-arm64,node20-linux-x64,node20-win-x64 --output dist/tumiki-proxy",
+    "build:binary:bun": "bun build src/index.ts --compile --target=bun --outfile tumiki-proxy",
+    "build:binary": "npm run build:binary:bun",
     "build:all": "npm run build && npm run build:binary"
   },
   "keywords": [
@@ -27,9 +29,11 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
+    "@vercel/ncc": "^0.38.4",
+    "@yao-pkg/pkg": "^5.11.0",
     "esbuild": "^0.19.0",
-    "@yao-pkg/pkg": "^5.11.0"
+    "nexe": "^5.0.0-beta.4",
+    "typescript": "^5.0.0"
   },
   "pkg": {
     "assets": [],

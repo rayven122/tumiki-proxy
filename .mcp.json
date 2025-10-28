@@ -1,9 +1,8 @@
 {
   "mcpServers": {
     "filesystem": {
-      "command": "node",
+      "command": "./tumiki-proxy",
       "args": [
-        "dist/index.js",
         "npx",
         "-y",
         "@modelcontextprotocol/server-filesystem",
@@ -14,9 +13,8 @@
       }
     },
     "context7": {
-      "command": "node",
+      "command": "./tumiki-proxy",
       "args": [
-        "dist/index.js",
         "--http",
         "https://mcp.context7.com/mcp"
       ],
