@@ -56,16 +56,25 @@ git push origin main
 
 ### 4. ユーザーへのインストール手順
 
-現在のリポジトリから直接インストールできます：
+現在のリポジトリを完全URLで指定することで、`homebrew-` プレフィックスなしでTapとして使用できます：
 
 ```bash
-# Formulaを直接指定してインストール（推奨）
-brew install https://raw.githubusercontent.com/rayven122/tumiki-proxy/main/Formula/tumiki-proxy.rb
+# Tapを追加（完全URLを指定）
+brew tap rayven122/tumiki-proxy https://github.com/rayven122/tumiki-proxy
+
+# インストール
+brew install tumiki-proxy
+
+# アップデート
+brew update
+brew upgrade tumiki-proxy
 ```
 
-#### 独自Tapを作成する場合（オプション）
+**重要**: 完全URL（`https://github.com/...`）を指定することで、リポジトリ名を変更する必要はありません。
 
-複数のformulaを管理する場合や、より短いコマンド（`brew install tumiki-proxy`）を提供したい場合は、独自のTapリポジトリを作成できます：
+#### 独自Tapリポジトリを作成する場合（オプション）
+
+短いコマンド（`brew tap rayven122/tumiki`）を使いたい場合のみ、`homebrew-` プレフィックス付きの独自Tapリポジトリを作成してください：
 
 1. GitHubで新しいリポジトリ `homebrew-tumiki` を作成
 2. `Formula/tumiki-proxy.rb` をそこに配置
@@ -76,7 +85,7 @@ brew tap rayven122/tumiki
 brew install tumiki-proxy
 ```
 
-**注意**: Tap形式（`brew install rayven122/tumiki-proxy/tumiki-proxy`）を使用するには、`homebrew-tumiki`という名前の独自Tapリポジトリが必要です。現在のメインリポジトリにFormulaを配置するだけでは、この形式は動作しません。
+**通常は不要**: 完全URL指定で現在のリポジトリをそのまま使えるため、別のTapリポジトリを作成する必要はありません。
 
 ## バージョン更新手順
 

@@ -20,8 +20,13 @@ MCP (Model Context Protocol) サーバーの透過的ロギングプロキシ。
 macOSまたはLinuxユーザーの場合、Homebrewで最も簡単にインストールできます：
 
 ```bash
-# Formulaを直接指定してインストール
-brew install https://raw.githubusercontent.com/rayven122/tumiki-proxy/main/Formula/tumiki-proxy.rb
+# Tapを追加してインストール
+brew tap rayven122/tumiki-proxy https://github.com/rayven122/tumiki-proxy
+brew install tumiki-proxy
+
+# アップデート
+brew update
+brew upgrade tumiki-proxy
 ```
 
 詳細は[Homebrewインストールガイド](./claudedocs/HOMEBREW_INSTALL.md)を参照してください。
