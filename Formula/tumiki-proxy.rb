@@ -22,8 +22,10 @@ class TumikiProxy < Formula
   end
 
   def install
-    # Downloaded binary has platform-specific name, rename to tumiki-proxy
-    bin.install Dir["*"].select { |f| File.file?(f) && File.executable?(f) }.first => "tumiki-proxy"
+    # The downloaded file is named tumiki-proxy-macos-arm64 or tumiki-proxy-macos-x64
+    # Find and rename to tumiki-proxy
+    binary = Dir["tumiki-proxy-*"].first
+    bin.install binary => "tumiki-proxy" if binary
   end
 
   test do
