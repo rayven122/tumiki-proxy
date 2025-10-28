@@ -10,8 +10,8 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node dist/index.js",
-    "build:bundle": "esbuild src/index.ts --bundle --platform=node --target=node18 --format=cjs --outfile=dist/bundle.js",
-    "build:binary": "npm run build:bundle && pkg dist/bundle.js --compress GZip --targets node18-macos-x64,node18-macos-arm64,node18-linux-x64,node18-win-x64 --output dist/tumiki-proxy",
+    "build:bundle": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/bundle.cjs --keep-names",
+    "build:binary": "npm run build:bundle && pkg dist/bundle.cjs --compress GZip --targets node20-macos-x64,node20-macos-arm64,node20-linux-x64,node20-win-x64 --output dist/tumiki-proxy",
     "build:all": "npm run build && npm run build:binary"
   },
   "keywords": [

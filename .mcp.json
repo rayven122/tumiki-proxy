@@ -3,7 +3,7 @@
     "filesystem": {
       "command": "node",
       "args": [
-        "/Users/hisuzuya/Documents/app/rayven/tumiki-proxy/dist/index.js",
+        "dist/index.js",
         "npx",
         "-y",
         "@modelcontextprotocol/server-filesystem",
@@ -16,7 +16,7 @@
     "context7": {
       "command": "node",
       "args": [
-        "/Users/hisuzuya/Documents/app/rayven/tumiki-proxy/dist/index.js",
+        "dist/index.js",
         "--http",
         "https://mcp.context7.com/mcp"
       ],
